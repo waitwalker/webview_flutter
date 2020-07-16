@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" group="android" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="android/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1157666756/e2e.iml" filepath="$PROJECT_DIR$/.idea/modules/1157666756/e2e.iml" group="android/e2e" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1931350778/webview_flutter.iml" filepath="$PROJECT_DIR$/.idea/modules/1931350778/webview_flutter.iml" group="android/webview_flutter" />
     </modules>
   </component>
 </project>
