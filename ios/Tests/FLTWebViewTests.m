@@ -1,11 +1,13 @@
-// Copyright 2019 The Chromium Authors. All rights reserved.
+// Copyright 2013 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 @import Flutter;
-@import OCMock;
 @import XCTest;
 @import webview_flutter;
+
+// OCMock library doesn't generate a valid modulemap.
+#import <OCMock/OCMock.h>
 
 static bool feq(CGFloat a, CGFloat b) { return fabs(b - a) < FLT_EPSILON; }
 

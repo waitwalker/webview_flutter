@@ -1,9 +1,10 @@
-// Copyright 2018 The Chromium Authors. All rights reserved.
+// Copyright 2013 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 #import "FlutterWebView.h"
 #import "FLTWKNavigationDelegate.h"
+#import "FLTWKProgressionDelegate.h"
 #import "JavaScriptChannelHandler.h"
 
 @implementation FLTWebViewFactory {
@@ -64,6 +65,7 @@
   // The set of registered JavaScript channel names.
   NSMutableSet* _javaScriptChannelNames;
   FLTWKNavigationDelegate* _navigationDelegate;
+  FLTWKProgressionDelegate* _progressionDelegate;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -87,12 +89,14 @@
     NSDictionary<NSString*, id>* settings = args[@"settings"];
 
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
+    [self applyConfigurationSettings:settings toConfiguration:configuration];
     configuration.userContentController = userContentController;
     [self updateAutoMediaPlaybackPolicy:args[@"autoMediaPlaybackPolicy"]
                         inConfiguration:configuration];
     configuration.allowsInlineMediaPlayback = true;
     _webView = [[FLTWKWebView alloc] initWithFrame:frame configuration:configuration];
     _navigationDelegate = [[FLTWKNavigationDelegate alloc] initWithChannel:_channel];
+    _webView.UIDelegate = self;
     _webView.navigationDelegate = _navigationDelegate;
     __weak __typeof__(self) weakSelf = self;
     [_channel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
@@ -116,6 +120,12 @@
     }
   }
   return self;
+}
+
+- (void)dealloc {
+  if (_progressionDelegate != nil) {
+    [_progressionDelegate stopObservingProgress:_webView];
+  }
 }
 
 - (UIView*)view {
@@ -149,6 +159,14 @@
     [self clearCache:result];
   } else if ([[call method] isEqualToString:@"getTitle"]) {
     [self onGetTitle:result];
+  } else if ([[call method] isEqualToString:@"scrollTo"]) {
+    [self onScrollTo:call result:result];
+  } else if ([[call method] isEqualToString:@"scrollBy"]) {
+    [self onScrollBy:call result:result];
+  } else if ([[call method] isEqualToString:@"getScrollX"]) {
+    [self getScrollX:call result:result];
+  } else if ([[call method] isEqualToString:@"getScrollY"]) {
+    [self getScrollY:call result:result];
   } else {
     result(FlutterMethodNotImplemented);
   }
@@ -274,6 +292,36 @@
   result(title);
 }
 
+- (void)onScrollTo:(FlutterMethodCall*)call result:(FlutterResult)result {
+  NSDictionary* arguments = [call arguments];
+  int x = [arguments[@"x"] intValue];
+  int y = [arguments[@"y"] intValue];
+
+  _webView.scrollView.contentOffset = CGPointMake(x, y);
+  result(nil);
+}
+
+- (void)onScrollBy:(FlutterMethodCall*)call result:(FlutterResult)result {
+  CGPoint contentOffset = _webView.scrollView.contentOffset;
+
+  NSDictionary* arguments = [call arguments];
+  int x = [arguments[@"x"] intValue] + contentOffset.x;
+  int y = [arguments[@"y"] intValue] + contentOffset.y;
+
+  _webView.scrollView.contentOffset = CGPointMake(x, y);
+  result(nil);
+}
+
+- (void)getScrollX:(FlutterMethodCall*)call result:(FlutterResult)result {
+  int offsetX = _webView.scrollView.contentOffset.x;
+  result([NSNumber numberWithInt:offsetX]);
+}
+
+- (void)getScrollY:(FlutterMethodCall*)call result:(FlutterResult)result {
+  int offsetY = _webView.scrollView.contentOffset.y;
+  result([NSNumber numberWithInt:offsetY]);
+}
+
 // Returns nil when successful, or an error message when one or more keys are unknown.
 - (NSString*)applySettings:(NSDictionary<NSString*, id>*)settings {
   NSMutableArray<NSString*>* unknownKeys = [[NSMutableArray alloc] init];
@@ -284,6 +332,13 @@
     } else if ([key isEqualToString:@"hasNavigationDelegate"]) {
       NSNumber* hasDartNavigationDelegate = settings[key];
       _navigationDelegate.hasDartNavigationDelegate = [hasDartNavigationDelegate boolValue];
+    } else if ([key isEqualToString:@"hasProgressTracking"]) {
+      NSNumber* hasProgressTrackingValue = settings[key];
+      bool hasProgressTracking = [hasProgressTrackingValue boolValue];
+      if (hasProgressTracking) {
+        _progressionDelegate = [[FLTWKProgressionDelegate alloc] initWithWebView:_webView
+                                                                         channel:_channel];
+      }
     } else if ([key isEqualToString:@"debuggingEnabled"]) {
       // no-op debugging is always enabled on iOS.
     } else if ([key isEqualToString:@"gestureNavigationEnabled"]) {
@@ -302,6 +357,18 @@
   }
   return [NSString stringWithFormat:@"webview_flutter: unknown setting keys: {%@}",
                                     [unknownKeys componentsJoinedByString:@", "]];
+}
+
+- (void)applyConfigurationSettings:(NSDictionary<NSString*, id>*)settings
+                   toConfiguration:(WKWebViewConfiguration*)configuration {
+  NSAssert(configuration != _webView.configuration,
+           @"configuration needs to be updated before webView.configuration.");
+  for (NSString* key in settings) {
+    if ([key isEqualToString:@"allowsInlineMediaPlayback"]) {
+      NSNumber* allowsInlineMediaPlayback = settings[key];
+      configuration.allowsInlineMediaPlayback = [allowsInlineMediaPlayback boolValue];
+    }
+  }
 }
 
 - (void)updateJsMode:(NSNumber*)mode {
@@ -396,6 +463,19 @@
   } else {
     NSLog(@"Updating UserAgent is not supported for Flutter WebViews prior to iOS 9.");
   }
+}
+
+#pragma mark WKUIDelegate
+
+- (WKWebView*)webView:(WKWebView*)webView
+    createWebViewWithConfiguration:(WKWebViewConfiguration*)configuration
+               forNavigationAction:(WKNavigationAction*)navigationAction
+                    windowFeatures:(WKWindowFeatures*)windowFeatures {
+  if (!navigationAction.targetFrame.isMainFrame) {
+    [webView loadRequest:navigationAction.request];
+  }
+
+  return nil;
 }
 
 @end
