@@ -4,8 +4,13 @@
 
 package io.flutter.plugins.webviewflutter;
 
+import android.app.Activity;
+import androidx.annotation.NonNull;
+import java.lang.ref.WeakReference;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 
 /**
  * Java platform implementation of the webview_flutter plugin.
@@ -15,10 +20,10 @@ import io.flutter.plugin.common.BinaryMessenger;
  * <p>Call {@link #registerWith(Registrar)} to use the stable {@code io.flutter.plugin.common}
  * package instead.
  */
-public class WebViewFlutterPlugin implements FlutterPlugin {
+public class WebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   private FlutterCookieManager flutterCookieManager;
-
+  public static WeakReference<Activity> activityRef;
   /**
    * Add an instance of this to {@link io.flutter.embedding.engine.plugins.PluginRegistry} to
    * register it.
@@ -53,8 +58,7 @@ public class WebViewFlutterPlugin implements FlutterPlugin {
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
     BinaryMessenger messenger = binding.getBinaryMessenger();
-    binding
-        .getPlatformViewRegistry()
+    binding.getPlatformViewRegistry()
         .registerViewFactory(
             "plugins.flutter.io/webview", new WebViewFactory(messenger, /*containerView=*/ null));
     flutterCookieManager = new FlutterCookieManager(messenger);
@@ -68,5 +72,29 @@ public class WebViewFlutterPlugin implements FlutterPlugin {
 
     flutterCookieManager.dispose();
     flutterCookieManager = null;
+  }
+
+  @Override
+  public void onAttachedToActivity(ActivityPluginBinding binding) {
+    updateActivity(binding.getActivity());
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding activityPluginBinding) {
+
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+
+  }
+
+  public static void updateActivity(Activity activity) {
+    activityRef = new WeakReference<Activity>(activity);
   }
 }
