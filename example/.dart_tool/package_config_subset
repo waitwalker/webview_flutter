@@ -114,10 +114,6 @@ webdriver
 2.0
 file:///Users/waitwalker/.pub-cache/hosted/pub.flutter-io.cn/webdriver-2.1.2/
 file:///Users/waitwalker/.pub-cache/hosted/pub.flutter-io.cn/webdriver-2.1.2/lib/
-webview_flutter
-2.12
-file:///Users/waitwalker/Downloads/webview_flutter/
-file:///Users/waitwalker/Downloads/webview_flutter/lib/
 sky_engine
 2.12
 file:///Users/waitwalker/fvm/versions/2.0.1/bin/cache/pkg/sky_engine/
@@ -142,8 +138,12 @@ integration_test
 2.10
 file:///Users/waitwalker/fvm/versions/2.0.1/packages/integration_test/
 file:///Users/waitwalker/fvm/versions/2.0.1/packages/integration_test/lib/
+webview_flutter
+2.12
+file:///Users/waitwalker/webview_flutter/
+file:///Users/waitwalker/webview_flutter/lib/
 webview_flutter_example
 2.12
-file:///Users/waitwalker/Downloads/webview_flutter/example/
-file:///Users/waitwalker/Downloads/webview_flutter/example/lib/
+file:///Users/waitwalker/webview_flutter/example/
+file:///Users/waitwalker/webview_flutter/example/lib/
 2

@@ -1,0 +1,6 @@
+io/flutter/plugins/GeneratedPluginRegistrant.java
+ io.flutter.plugins.GeneratedPluginRegistrant
+io/flutter/plugins/webviewflutterexample/EmbeddingV1Activity.java
+ io.flutter.plugins.webviewflutterexample.EmbeddingV1Activity
+io/flutter/plugins/webviewflutterexample/BuildConfig.java
+ io.flutter.plugins.webviewflutterexample.BuildConfig

@@ -114,10 +114,6 @@ webdriver
 2.0
 file:///Users/waitwalker/.pub-cache/hosted/pub.flutter-io.cn/webdriver-2.1.2/
 file:///Users/waitwalker/.pub-cache/hosted/pub.flutter-io.cn/webdriver-2.1.2/lib/
-webview_flutter
-2.12
-file:///Users/waitwalker/Downloads/webview_flutter/
-file:///Users/waitwalker/Downloads/webview_flutter/lib/
 sky_engine
 2.12
 file:///Users/waitwalker/fvm/versions/2.0.1/bin/cache/pkg/sky_engine/
@@ -138,4 +134,8 @@ fuchsia_remote_debug_protocol
 2.2
 file:///Users/waitwalker/fvm/versions/2.0.1/packages/fuchsia_remote_debug_protocol/
 file:///Users/waitwalker/fvm/versions/2.0.1/packages/fuchsia_remote_debug_protocol/lib/
+webview_flutter
+2.12
+file:///Users/waitwalker/webview_flutter/
+file:///Users/waitwalker/webview_flutter/lib/
 2
